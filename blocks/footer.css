@@ -4,9 +4,7 @@
 }
 
 .footer__copyright {
-  width: 104;
-  height: 16;
-
+  margin: 0;
   font-weight: 400;
   font-size: 16px;
   line-height: 16px;
