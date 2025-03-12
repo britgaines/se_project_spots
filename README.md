@@ -15,4 +15,4 @@ This third project with TripleTen is a responsive webpage created implemented us
 
 This webpage is deployed to GitHub Pages
 
-- https://github.com/britgaines/se_project_spots.git
+https://britgaines.github.io/se_project_spots/
