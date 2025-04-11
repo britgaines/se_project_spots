@@ -45,6 +45,11 @@
   background-color: transparent;
 }
 
+.modal__close-button:hover {
+  cursor: pointer;
+  opacity: 1;
+}
+
 .modal__title {
   margin: 0 0 32px;
   color: #212121;
@@ -70,10 +75,15 @@
   font-weight: 500;
   color: #212121;
   border-radius: 8px;
-  border: 1px solid #212121;
+  border: 1px solid #21212166;
 }
 .modal__input::placeholder {
   color: #2121214d;
+}
+
+.modal__input:hover {
+  cursor: pointer;
+  border: 1px solid #212121;
 }
 
 .modal__submit-button {
