@@ -115,16 +115,17 @@
 }
 
 .modal__caption {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 10px);
+  margin: 0;
   color: #fff;
   background-color: #212121;
-  width: 214px;
-  height: 32px;
   border-radius: 8px;
   font-weight: 500;
   font-size: 20px;
   line-height: 1.2;
   letter-spacing: 0%;
-  text-align: center;
   padding-top: 4px;
 }
 
@@ -145,10 +146,6 @@
 }
 
 @media screen and (max-width: 627px) {
-  .modal {
-    padding: 0 10px;
-  }
-
   .modal__container {
     padding: 12px;
   }
@@ -178,5 +175,6 @@
 
   .modal__image {
     max-width: unset;
+    max-height: none;
   }
 }
