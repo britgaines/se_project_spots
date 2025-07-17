@@ -98,11 +98,30 @@ function getCardElement(data) {
   return cardElement;
 }
 
-const ProfileNameEl = document.querySelector(".profile__name");
-const ProfileDescriptionEl = document.querySelector(".profile__description");
+const profileNameEl = document.querySelector(".profile__name");
+const profileDescriptionEl = document.querySelector(".profile__description");
 
 function openModal(modal) {
   modal.classList.add("modal_is-opened");
+
+  function handleEscClose(evt) {
+    if (evt.key === "Escape") {
+      closeModal(modal);
+      document.removeEventListener("keydown", handleEscClose);
+      modal.removeEventListener("mousedown", handleOverlayClick);
+    }
+  }
+
+  function handleOverlayClick(evt) {
+    if (evt.target === modal) {
+      closeModal(modal);
+      document.removeEventListener("keydown", handleEscClose);
+      modal.removeEventListener("mousedown", handleOverlayClick);
+    }
+  }
+
+  document.addEventListener("keydown", handleEscClose);
+  modal.addEventListener("mousedown", handleOverlayClick);
 }
 
 function closeModal(modal) {
@@ -110,11 +129,20 @@ function closeModal(modal) {
 }
 
 editProfileBtn.addEventListener("click", function () {
-  editProfileNameInput.value = ProfileNameEl.textContent;
-  editProfileDescriptionInput.value = ProfileDescriptionEl.textContent;
+  editProfileNameInput.value = profileNameEl.textContent;
+  editProfileDescriptionInput.value = profileDescriptionEl.textContent;
   resetValidation(
     editProfileForm,
     [editProfileNameInput, editProfileDescriptionInput],
+    settings
+  );
+  const inputList = Array.from(
+    editProfileForm.querySelectorAll(settings.inputSelector)
+  );
+
+  toggleButtonState(
+    inputList,
+    editProfileForm.querySelector(settings.submitButtonSelector),
     settings
   );
   openModal(editProfileModal);
@@ -137,8 +165,8 @@ newPostCloseButton.addEventListener("click", function () {
 
 function handleEditProfileSubmit(evt) {
   evt.preventDefault();
-  ProfileNameEl.textContent = editProfileNameInput.value;
-  ProfileDescriptionEl.textContent = editProfileDescriptionInput.value;
+  profileNameEl.textContent = editProfileNameInput.value;
+  profileDescriptionEl.textContent = editProfileDescriptionInput.value;
   closeModal(editProfileModal);
 }
 
