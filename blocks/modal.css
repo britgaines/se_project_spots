@@ -77,6 +77,11 @@
   border-radius: 8px;
   border: 1px solid #21212166;
 }
+
+.modal__input_type_error {
+  border: 1px solid rgba(255, 0, 0, 0.6);
+}
+
 .modal__input::placeholder {
   color: #2121214d;
 }
@@ -84,6 +89,16 @@
 .modal__input:hover {
   cursor: pointer;
   border: 1px solid #212121;
+}
+
+.modal__error {
+  display: block;
+  color: rgba(255, 0, 0, 0.7);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1;
+  width: 630px;
+  height: 18px;
 }
 
 .modal__submit-button {
@@ -99,6 +114,11 @@
 .modal__submit-button:hover {
   cursor: pointer;
   opacity: 0.8;
+}
+
+.modal__submit-button_type_disabled {
+  background-color: rgba(33, 33, 33, 0.5);
+  border: none;
 }
 
 .modal__content {
