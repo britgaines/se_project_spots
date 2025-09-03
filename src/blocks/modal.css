@@ -54,8 +54,9 @@
   margin: 0 0 32px;
   color: #212121;
   font-weight: 500;
-  font-size: 32px;
+  font-size: 24px;
   line-height: 1;
+  font-family: "Poppins", sans-serif;
 }
 
 .modal__label {
@@ -121,6 +122,49 @@
   border: none;
 }
 
+.modal__form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 24px;
+}
+
+.modal__delete-title {
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 1;
+  text-align: center;
+}
+
+.modal__delete-button,
+.modal__cancel-button {
+  width: 156px;
+  height: 52px;
+  border-radius: 8px;
+  padding: 18px 32px;
+  gap: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 1;
+  font-family: "Poppins";
+}
+
+.modal__delete-button {
+  background: rgba(255, 101, 101, 1);
+  border: none;
+  color: rgba(33, 33, 33, 1);
+}
+
+.modal__cancel-button {
+  border: 1px solid rgba(33, 33, 33, 1);
+  background: transparent;
+  color: rgba(33, 33, 33, 1);
+}
 .modal__content {
   position: relative;
 }

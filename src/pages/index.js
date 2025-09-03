@@ -62,6 +62,15 @@ api
   })
   .catch(console.error);
 
+//edit avatar elements
+const avatarModal = document.querySelector("#edit-avatar-modal");
+const avatarForm = avatarModal.querySelector(".modal__form");
+const avatarModalBtn = document.querySelector(".profile__avatar-button");
+const avatarSubmitButton = avatarModal.querySelector(".modal__submit-button");
+const avatarCloseButton = avatarModal.querySelector(".modal__close-button");
+const avatarInput = avatarModal.querySelector("#profile-avatar-input");
+
+//edit profile elements
 const editProfileBtn = document.querySelector(".profile__edit-button");
 const editProfileModal = document.querySelector("#edit-profile-modal");
 const editProfileCloseButton = editProfileModal.querySelector(
@@ -75,15 +84,23 @@ const editProfileDescriptionInput = editProfileModal.querySelector(
   "#profile-description-input"
 );
 
+//new post elements
 const newPostBtn = document.querySelector(".profile__add-button");
 const newPostModal = document.querySelector("#new-post-modal");
 const cardSubmitButton = newPostModal.querySelector(".modal__submit-button");
 const newPostCloseButton = newPostModal.querySelector(".modal__close-button");
-
 const newPostForm = newPostModal.querySelector(".modal__form");
 const newPostImageInput = newPostModal.querySelector("#card-image-input");
 const newPostCaptionInput = newPostModal.querySelector("#card-caption-input");
 
+//delete card elements
+const deleteModal = document.querySelector("#delete-modal");
+const deleteForm = deleteModal.querySelector(".modal__form");
+const deleteSubmitButton = deleteForm.querySelector(".modal__delete-button");
+const deleteCancelButton = deleteForm.querySelector(".modal__cancel-button");
+const deleteCloseButton = deleteModal.querySelector(".modal__close-button");
+
+//preview elements
 const previewModal = document.querySelector("#preview-modal");
 const previewModalCloseBtn = previewModal.querySelector(".modal__close-button");
 const previewImageEl = previewModal.querySelector(".modal__image");
@@ -111,7 +128,24 @@ function getCardElement(data) {
 
   const cardDeleteBtnEl = cardElement.querySelector(".card__delete-button");
   cardDeleteBtnEl.addEventListener("click", () => {
-    cardElement.remove();
+    openModal(deleteModal);
+    deleteForm.cardToDelete = cardElement;
+  });
+
+  deleteForm.addEventListener("submit", (evt) => {
+    evt.preventDefault();
+
+    if (deleteForm.cardToDelete) {
+      deleteForm.cardToDelete.remove();
+      delete deleteForm.cardToDelete;
+    }
+
+    closeModal(deleteModal);
+  });
+
+  deleteCancelButton.addEventListener("click", () => {
+    delete deleteForm.cardToDelete;
+    closeModal(deleteModal);
   });
 
   cardImageEl.addEventListener("click", () => {
@@ -189,12 +223,63 @@ const cardImageEl = document.querySelector(".card__image");
 const cardCaptionEl = document.querySelector(".card__title");
 
 newPostBtn.addEventListener("click", function () {
+  resetValidation(
+    newPostForm,
+    [newPostImageInput, newPostCaptionInput],
+    validationConfig
+  );
+
+  const inputList = Array.from(
+    newPostForm.querySelectorAll(validationConfig.inputSelector)
+  );
+
+  toggleButtonState(
+    inputList,
+    newPostForm.querySelector(validationConfig.submitButtonSelector),
+    validationConfig
+  );
+
   openModal(newPostModal);
 });
 
 newPostCloseButton.addEventListener("click", function () {
   closeModal(newPostModal);
 });
+
+avatarModalBtn.addEventListener("click", function () {
+  resetValidation(avatarForm, [avatarInput], validationConfig);
+
+  const inputList = Array.from(
+    avatarForm.querySelectorAll(validationConfig.inputSelector)
+  );
+
+  toggleButtonState(
+    inputList,
+    avatarForm.querySelector(validationConfig.submitButtonSelector),
+    validationConfig
+  );
+
+  openModal(avatarModal);
+});
+
+avatarCloseButton.addEventListener("click", function () {
+  closeModal(avatarModal);
+});
+
+avatarForm.addEventListener("submit", handleAvatarSubmit);
+
+function handleAvatarSubmit(evt) {
+  evt.preventDefault();
+
+  api
+    .editAvatarInfo(avatarInput.value)
+    .then((data) => {
+      document.querySelector(".profile__avatar").src = data.avatar;
+      closeModal(avatarModal);
+      avatarForm.reset();
+    })
+    .catch(console.error);
+}
 
 function handleEditProfileSubmit(evt) {
   evt.preventDefault();
