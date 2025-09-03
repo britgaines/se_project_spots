@@ -5,6 +5,7 @@ import {
   validationConfig,
   resetValidation,
   toggleButtonState,
+  disableButton,
 } from "../scripts/validation.js";
 
 import Api from "../utils/Api.js";
@@ -62,6 +63,9 @@ api
   })
   .catch(console.error);
 
+let selectedCard;
+let selectedCardId;
+
 //edit avatar elements
 const avatarModal = document.querySelector("#edit-avatar-modal");
 const avatarForm = avatarModal.querySelector(".modal__form");
@@ -73,6 +77,9 @@ const avatarInput = avatarModal.querySelector("#profile-avatar-input");
 //edit profile elements
 const editProfileBtn = document.querySelector(".profile__edit-button");
 const editProfileModal = document.querySelector("#edit-profile-modal");
+const editProfileSubmitButton = editProfileModal.querySelector(
+  ".modal__submit-button"
+);
 const editProfileCloseButton = editProfileModal.querySelector(
   ".modal__close-button"
 );
@@ -123,31 +130,34 @@ function getCardElement(data) {
 
   const cardLikeBtnEl = cardElement.querySelector(".card__like-button");
   cardLikeBtnEl.addEventListener("click", () => {
-    cardLikeBtnEl.classList.toggle("card__like-button_active");
+    const isLiked = cardLikeBtnEl.classList.contains(
+      "card__like-button_active"
+    );
+    const toggleLike = isLiked
+      ? api.removeLike.bind(api)
+      : api.addLike.bind(api);
+    toggleLike(data._id)
+      .then((updatedCard) => {
+        cardLikeBtnEl.classList.toggle(
+          "card__like-button_active",
+          updatedCard.isLiked
+        );
+      })
+      .catch(console.error);
   });
 
   const cardDeleteBtnEl = cardElement.querySelector(".card__delete-button");
   cardDeleteBtnEl.addEventListener("click", () => {
+    selectedCard = cardElement;
+    selectedCardId = data._id;
     openModal(deleteModal);
-    deleteForm.cardToDelete = cardElement;
-  });
-
-  deleteForm.addEventListener("submit", (evt) => {
-    evt.preventDefault();
-
-    if (deleteForm.cardToDelete) {
-      deleteForm.cardToDelete.remove();
-      delete deleteForm.cardToDelete;
-    }
-
-    closeModal(deleteModal);
   });
 
   deleteCancelButton.addEventListener("click", () => {
-    delete deleteForm.cardToDelete;
+    selectedCard = null;
+    selectedCardId = null;
     closeModal(deleteModal);
   });
-
   cardImageEl.addEventListener("click", () => {
     previewImageEl.src = data.link;
     previewImageEl.alt = data.name;
@@ -266,7 +276,23 @@ avatarCloseButton.addEventListener("click", function () {
   closeModal(avatarModal);
 });
 
-avatarForm.addEventListener("submit", handleAvatarSubmit);
+avatarForm.addEventListener("submit", (evt) => {
+  evt.preventDefault();
+  const originalText = avatarSubmitButton.textContent;
+  avatarSubmitButton.textContent = "Saving...";
+
+  api
+    .editAvatarInfo(avatarInput.value)
+    .then((userData) => {
+      document.querySelector(".profile__avatar").src = userData.avatar;
+      closeModal(avatarModal);
+      avatarForm.reset();
+    })
+    .catch(console.error)
+    .finally(() => {
+      avatarSubmitButton.textContent = originalText;
+    });
+});
 
 function handleAvatarSubmit(evt) {
   evt.preventDefault();
@@ -281,22 +307,26 @@ function handleAvatarSubmit(evt) {
     .catch(console.error);
 }
 
-function handleEditProfileSubmit(evt) {
+editProfileForm.addEventListener("submit", (evt) => {
   evt.preventDefault();
+  const originalText = editProfileSubmitButton.textContent;
+  editProfileSubmitButton.textContent = "Saving...";
+
   api
     .editUserInfo({
       name: editProfileNameInput.value,
       about: editProfileDescriptionInput.value,
     })
-    .then((data) => {
-      profileNameEl.textContent = data.name;
-      profileDescriptionEl.textContent = data.about;
+    .then((userData) => {
+      profileNameEl.textContent = userData.name;
+      profileDescriptionEl.textContent = userData.about;
       closeModal(editProfileModal);
     })
-    .catch(console.error);
-}
-
-editProfileForm.addEventListener("submit", handleEditProfileSubmit);
+    .catch(console.error)
+    .finally(() => {
+      editProfileSubmitButton.textContent = originalText;
+    });
+});
 
 function handleNewPostSubmit(evt) {
   evt.preventDefault();
@@ -306,13 +336,69 @@ function handleNewPostSubmit(evt) {
     link: newPostImageInput.value,
   };
 
-  const cardElement = getCardElement(inputValues);
-  cardsList.prepend(cardElement);
-  closeModal(newPostModal);
-  newPostForm.reset();
-  disableButton(cardSubmitButton, validationConfig);
+  api
+    .addNewCard(inputValues)
+    .then((newCardData) => {
+      const cardElement = getCardElement(newCardData);
+      cardsList.prepend(cardElement);
+      closeModal(newPostModal);
+      newPostForm.reset();
+      disableButton(cardSubmitButton, validationConfig);
+    })
+    .catch(console.error);
 }
 
-newPostForm.addEventListener("submit", handleNewPostSubmit);
+newPostForm.addEventListener("submit", (evt) => {
+  evt.preventDefault();
+  const originalText = cardSubmitButton.textContent;
+  cardSubmitButton.textContent = "Saving...";
+
+  api
+    .addNewCard({
+      name: newPostCaptionInput.value,
+      link: newPostImageInput.value,
+    })
+    .then((cardData) => {
+      const cardElement = getCardElement(cardData);
+      cardsList.prepend(cardElement);
+      closeModal(newPostModal);
+      newPostForm.reset();
+    })
+    .catch(console.error)
+    .finally(() => {
+      cardSubmitButton.textContent = originalText;
+    });
+});
+
+function handleDeleteSubmit(evt) {
+  evt.preventDefault();
+
+  api
+    .removeCard(selectedCardId)
+    .then(() => {
+      selectedCard.remove();
+      selectedCard = null;
+      selectedCardId = null;
+      closeModal(deleteModal);
+    })
+    .catch(console.error);
+}
+
+deleteForm.addEventListener("submit", (evt) => {
+  evt.preventDefault();
+  const originalText = deleteSubmitButton.textContent;
+  deleteSubmitButton.textContent = "Deleting...";
+
+  api
+    .removeCard(selectedCardId)
+    .then(() => {
+      selectedCard.remove();
+      closeModal(deleteModal);
+    })
+    .catch(console.error)
+    .finally(() => {
+      deleteSubmitButton.textContent = originalText;
+    });
+});
 
 enableValidation(validationConfig);

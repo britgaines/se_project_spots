@@ -77,12 +77,15 @@ const setEventListeners = (formElement, config) => {
     });
   });
 };
-
 const enableValidation = (config) => {
-  const formList = document.querySelectorAll(config.formSelector);
-  formList.forEach((formElement) => {
-    setEventListeners(formElement, config);
-  });
+  const formList = Array.from(document.querySelectorAll(config.formSelector));
+  formList
+    .filter((formElement) =>
+      formElement.querySelector(config.submitButtonSelector)
+    )
+    .forEach((formElement) => {
+      setEventListeners(formElement, config);
+    });
 };
 
 export {
@@ -90,4 +93,5 @@ export {
   validationConfig,
   resetValidation,
   toggleButtonState,
+  disableButton,
 };
