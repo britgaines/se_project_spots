@@ -68,6 +68,7 @@
   font-weight: 500;
   color: #212121;
   opacity: 0.7;
+  font-family: "Poppins";
 }
 
 .modal__input {
@@ -136,6 +137,7 @@
   font-size: 24px;
   line-height: 1;
   text-align: center;
+  font-family: "Poppins";
 }
 
 .modal__delete-button,

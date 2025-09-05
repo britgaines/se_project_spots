@@ -59,7 +59,7 @@ api
 
     profileNameEl.textContent = userData.name;
     profileDescriptionEl.textContent = userData.about;
-    document.querySelector(".profile__avatar").src = userData.avatar;
+    profileAvatarEl.src = userData.avatar;
   })
   .catch(console.error);
 
@@ -67,6 +67,7 @@ let selectedCard;
 let selectedCardId;
 
 //edit avatar elements
+const profileAvatarEl = document.querySelector(".profile__avatar");
 const avatarModal = document.querySelector("#edit-avatar-modal");
 const avatarForm = avatarModal.querySelector(".modal__form");
 const avatarModalBtn = document.querySelector(".profile__avatar-button");
@@ -158,6 +159,11 @@ function getCardElement(data) {
     selectedCardId = null;
     closeModal(deleteModal);
   });
+
+  deleteCloseButton.addEventListener("click", function () {
+    closeModal(deleteModal);
+  });
+
   cardImageEl.addEventListener("click", () => {
     previewImageEl.src = data.link;
     previewImageEl.alt = data.name;
@@ -233,12 +239,6 @@ const cardImageEl = document.querySelector(".card__image");
 const cardCaptionEl = document.querySelector(".card__title");
 
 newPostBtn.addEventListener("click", function () {
-  resetValidation(
-    newPostForm,
-    [newPostImageInput, newPostCaptionInput],
-    validationConfig
-  );
-
   const inputList = Array.from(
     newPostForm.querySelectorAll(validationConfig.inputSelector)
   );
@@ -257,8 +257,6 @@ newPostCloseButton.addEventListener("click", function () {
 });
 
 avatarModalBtn.addEventListener("click", function () {
-  resetValidation(avatarForm, [avatarInput], validationConfig);
-
   const inputList = Array.from(
     avatarForm.querySelectorAll(validationConfig.inputSelector)
   );
@@ -284,7 +282,7 @@ avatarForm.addEventListener("submit", (evt) => {
   api
     .editAvatarInfo(avatarInput.value)
     .then((userData) => {
-      document.querySelector(".profile__avatar").src = userData.avatar;
+      profileAvatarEl.src = userData.avatar;
       closeModal(avatarModal);
       avatarForm.reset();
     })
@@ -293,19 +291,6 @@ avatarForm.addEventListener("submit", (evt) => {
       avatarSubmitButton.textContent = originalText;
     });
 });
-
-function handleAvatarSubmit(evt) {
-  evt.preventDefault();
-
-  api
-    .editAvatarInfo(avatarInput.value)
-    .then((data) => {
-      document.querySelector(".profile__avatar").src = data.avatar;
-      closeModal(avatarModal);
-      avatarForm.reset();
-    })
-    .catch(console.error);
-}
 
 editProfileForm.addEventListener("submit", (evt) => {
   evt.preventDefault();
@@ -328,26 +313,6 @@ editProfileForm.addEventListener("submit", (evt) => {
     });
 });
 
-function handleNewPostSubmit(evt) {
-  evt.preventDefault();
-
-  const inputValues = {
-    name: newPostCaptionInput.value,
-    link: newPostImageInput.value,
-  };
-
-  api
-    .addNewCard(inputValues)
-    .then((newCardData) => {
-      const cardElement = getCardElement(newCardData);
-      cardsList.prepend(cardElement);
-      closeModal(newPostModal);
-      newPostForm.reset();
-      disableButton(cardSubmitButton, validationConfig);
-    })
-    .catch(console.error);
-}
-
 newPostForm.addEventListener("submit", (evt) => {
   evt.preventDefault();
   const originalText = cardSubmitButton.textContent;
@@ -369,20 +334,6 @@ newPostForm.addEventListener("submit", (evt) => {
       cardSubmitButton.textContent = originalText;
     });
 });
-
-function handleDeleteSubmit(evt) {
-  evt.preventDefault();
-
-  api
-    .removeCard(selectedCardId)
-    .then(() => {
-      selectedCard.remove();
-      selectedCard = null;
-      selectedCardId = null;
-      closeModal(deleteModal);
-    })
-    .catch(console.error);
-}
 
 deleteForm.addEventListener("submit", (evt) => {
   evt.preventDefault();
