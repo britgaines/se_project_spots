@@ -49,9 +49,13 @@ const api = new Api({
   },
 });
 
+let currentUserId;
+
 api
   .getAppInfo()
   .then(([cards, userData]) => {
+    currentUserId = userData._id;
+
     cards.forEach((item) => {
       const cardElement = getCardElement(item);
       cardsList.append(cardElement);
@@ -137,15 +141,22 @@ function getCardElement(data) {
     const toggleLike = isLiked
       ? api.removeLike.bind(api)
       : api.addLike.bind(api);
+
     toggleLike(data._id)
       .then((updatedCard) => {
-        cardLikeBtnEl.classList.toggle(
-          "card__like-button_active",
-          updatedCard.isLiked
+        const isLiked = updatedCard.likes.some(
+          (user) => user._id === currentUserId
         );
+        cardLikeBtnEl.classList.toggle("card__like-button_active", isLiked);
       })
       .catch(console.error);
   });
+
+  const isLikedByUser = data.likes.some((user) => user._id === currentUserId);
+
+  if (isLikedByUser) {
+    cardLikeBtnEl.classList.add("card__like-button_active");
+  }
 
   const cardDeleteBtnEl = cardElement.querySelector(".card__delete-button");
   cardDeleteBtnEl.addEventListener("click", () => {
