@@ -49,13 +49,9 @@ const api = new Api({
   },
 });
 
-let currentUserId;
-
 api
   .getAppInfo()
   .then(([cards, userData]) => {
-    currentUserId = userData._id;
-
     cards.forEach((item) => {
       const cardElement = getCardElement(item);
       cardsList.append(cardElement);
@@ -134,29 +130,28 @@ function getCardElement(data) {
   cardTitleEl.textContent = data.name;
 
   const cardLikeBtnEl = cardElement.querySelector(".card__like-button");
-  cardLikeBtnEl.addEventListener("click", () => {
-    const isLiked = cardLikeBtnEl.classList.contains(
-      "card__like-button_active"
-    );
-    const toggleLike = isLiked
-      ? api.removeLike.bind(api)
-      : api.addLike.bind(api);
-
-    toggleLike(data._id)
-      .then((updatedCard) => {
-        const isLiked = updatedCard.likes.some(
-          (user) => user._id === currentUserId
-        );
-        cardLikeBtnEl.classList.toggle("card__like-button_active", isLiked);
-      })
-      .catch(console.error);
-  });
-
-  const isLikedByUser = data.likes.some((user) => user._id === currentUserId);
-
-  if (isLikedByUser) {
+  if (data.isLiked) {
     cardLikeBtnEl.classList.add("card__like-button_active");
   }
+  function handleLike(evt, cardId, cardLikeBtnEl) {
+    const isCurrentlyLiked = cardLikeBtnEl.classList.contains(
+      "card__like-button_active"
+    );
+
+    api
+      .changeLike(cardId, isCurrentlyLiked)
+      .then((updatedCard) => {
+        cardLikeBtnEl.classList.toggle(
+          "card__like-button_active",
+          updatedCard.isLiked
+        );
+      })
+      .catch(console.error);
+  }
+
+  cardLikeBtnEl.addEventListener("click", (evt) => {
+    handleLike(evt, data._id, cardLikeBtnEl);
+  });
 
   const cardDeleteBtnEl = cardElement.querySelector(".card__delete-button");
   cardDeleteBtnEl.addEventListener("click", () => {
