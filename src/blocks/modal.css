@@ -128,7 +128,7 @@
 
 .modal__form {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   gap: 16px;
   flex-wrap: wrap;

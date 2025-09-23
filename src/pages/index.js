@@ -166,10 +166,6 @@ function getCardElement(data) {
     closeModal(deleteModal);
   });
 
-  deleteCloseButton.addEventListener("click", function () {
-    closeModal(deleteModal);
-  });
-
   cardImageEl.addEventListener("click", () => {
     previewImageEl.src = data.link;
     previewImageEl.alt = data.name;
@@ -186,6 +182,10 @@ function getCardElement(data) {
 
   return cardElement;
 }
+
+deleteCloseButton.addEventListener("click", function () {
+  closeModal(deleteModal);
+});
 
 const profileNameEl = document.querySelector(".profile__name");
 const profileDescriptionEl = document.querySelector(".profile__description");
